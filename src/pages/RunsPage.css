@@ -206,6 +206,25 @@
     outline-offset: 4px;
 }
 
+.runs-toolbar__sort {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.runs-toolbar__select {
+    width: 100%;
+    max-width: 280px;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-primary);
+    background: var(--color-surface);
+    cursor: pointer;
+}
+
 @media (max-width: 1100px) {
     .run-card__details {
         grid-template-columns: repeat(2, minmax(0, 1fr));

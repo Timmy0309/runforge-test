@@ -63,6 +63,7 @@ async function renderPage() {
 
 describe("RunsPage", () => {
     beforeEach(() => {
+        window.history.replaceState(null, "", "/");
         vi.mocked(fetchRuns).mockReset();
         vi.mocked(fetchRuns).mockResolvedValue(testRuns);
     });

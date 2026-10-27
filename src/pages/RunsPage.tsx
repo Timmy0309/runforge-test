@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Run } from "../types/run";
+import type { Run, RunSort } from "../types/run";
 import { fetchRuns } from "../services/mockRuns";
 import { RunList } from "../components/RunList";
 import { RunsState } from "../components/RunsState";
@@ -10,15 +10,83 @@ import {
 import { RunDetails } from "../components/RunDetails";
 import "./RunsPage.css";
 
+function readUrlState() {
+    const params = new URLSearchParams(window.location.search);
+
+    const rawStatus = params.get("status");
+    const rawSort = params.get("sort");
+
+    const status: StatusFilter =
+        rawStatus === "queued" ||
+            rawStatus === "running" ||
+            rawStatus === "succeeded" ||
+            rawStatus === "failed"
+            ? rawStatus
+            : "all";
+
+    const sort: RunSort =
+        rawSort === "date-asc" ||
+            rawSort === "duration-desc" ||
+            rawSort === "duration-asc"
+            ? rawSort
+            : "date-desc";
+
+    return {
+        search: params.get("search") ?? "",
+        status,
+        sort,
+    };
+}
 
 export function RunsPage() {
     const [runs, setRuns] = useState<Run[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [requestAttempt, setRequestAttempt] = useState(0);
-    const [search, setSearch] = useState("");
-    const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
     const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
+    const [search, setSearch] = useState(() => readUrlState().search);
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>(() => readUrlState().status);
+    const [sort, setSort] = useState<RunSort>(() => readUrlState().sort);
+
+    useEffect(() => {
+        const url = new URL(window.location.href);
+
+        if (search) {
+            url.searchParams.set("search", search);
+        } else {
+            url.searchParams.delete("search");
+        }
+
+        if (statusFilter !== "all") {
+            url.searchParams.set("status", statusFilter);
+        } else {
+            url.searchParams.delete("status");
+        }
+
+        if (sort !== "date-desc") {
+            url.searchParams.set("sort", sort);
+        } else {
+            url.searchParams.delete("sort");
+        }
+
+        window.history.replaceState(window.history.state, "", url);
+    }, [search, statusFilter, sort]);
+
+    useEffect(() => {
+        function handlePopState() {
+            const state = readUrlState();
+
+            setSearch(state.search);
+            setStatusFilter(state.status);
+            setSort(state.sort);
+        }
+
+        window.addEventListener("popstate", handlePopState);
+
+        return () => {
+            window.removeEventListener("popstate", handlePopState);
+        };
+    }, []);
 
     useEffect(() => {
         let ignore = false;
@@ -68,6 +136,30 @@ export function RunsPage() {
         return matchesSearch && matchesStatus;
     });
 
+    const sortedRuns = [...filteredRuns].sort((a, b) => {
+        if (sort === "date-desc" || sort === "date-asc") {
+            const difference =
+                new Date(a.createdAt).getTime() -
+                new Date(b.createdAt).getTime();
+
+            return sort === "date-asc" ? difference : -difference;
+        }
+
+        if (
+            a.durationSeconds === undefined &&
+            b.durationSeconds === undefined
+        ) {
+            return 0;
+        }
+
+        if (a.durationSeconds === undefined) return 1;
+        if (b.durationSeconds === undefined) return -1;
+
+        const difference = a.durationSeconds - b.durationSeconds;
+
+        return sort === "duration-asc" ? difference : -difference;
+    });
+
     const hasActiveFilters = search.length > 0 || statusFilter !== "all";
 
     function resetFilters() {
@@ -99,6 +191,8 @@ export function RunsPage() {
                     onSearchChange={setSearch}
                     statusFilter={statusFilter}
                     onStatusFilterChange={setStatusFilter}
+                    sort={sort}
+                    onSortChange={setSort}
                 />
 
                 <div className="runs-panel__content" aria-busy={loading}>
@@ -116,7 +210,7 @@ export function RunsPage() {
                             onReset={hasActiveFilters ? resetFilters : undefined}
                         />
                     ) : (
-                        <RunList runs={filteredRuns} onOpenRun={setSelectedRunId} />
+                        <RunList runs={sortedRuns} onOpenRun={setSelectedRunId} />
                     )}
                 </div>
             </section>

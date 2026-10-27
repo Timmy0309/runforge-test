@@ -11,3 +11,5 @@ export type Run = {
     logs: string[]; 
     result?: string;
 };
+
+export type RunSort = "date-desc" | "date-asc" | "duration-desc" | "duration-asc";

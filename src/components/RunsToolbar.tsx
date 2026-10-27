@@ -1,4 +1,4 @@
-import type { RunStatus } from "../types/run";
+import type { RunSort, RunStatus } from "../types/run";
 
 export type StatusFilter = "all" | RunStatus;
 
@@ -7,6 +7,8 @@ type RunsToolbarProps = {
     onSearchChange: (value: string) => void;
     statusFilter: StatusFilter;
     onStatusFilterChange: (value: StatusFilter) => void;
+    sort: RunSort;
+    onSortChange: (value: RunSort) => void;
 };
 
 const statusFilters: { value: StatusFilter; label: string }[] = [
@@ -22,6 +24,8 @@ export function RunsToolbar({
     onSearchChange,
     statusFilter,
     onStatusFilterChange,
+    sort,
+    onSortChange,
 }: RunsToolbarProps) {
     return (
         <div className="runs-toolbar">
@@ -54,6 +58,26 @@ export function RunsToolbar({
                         {filter.label}
                     </button>
                 ))}
+            </div>
+
+            <div className="runs-toolbar__sort">
+                <label className="runs-toolbar__label" htmlFor="runs-sort">
+                    Сортировка
+                </label>
+
+                <select
+                    id="runs-sort"
+                    className="runs-toolbar__select"
+                    value={sort}
+                    onChange={(event) =>
+                        onSortChange(event.target.value as RunSort)
+                    }
+                >
+                    <option value="date-desc">Сначала новые</option>
+                    <option value="date-asc">Сначала старые</option>
+                    <option value="duration-desc">Сначала длительные</option>
+                    <option value="duration-asc">Сначала короткие</option>
+                </select>
             </div>
         </div>
     );
