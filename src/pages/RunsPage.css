@@ -1,0 +1,129 @@
+.run-list {
+    display: grid;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.run-list>li {
+    min-width: 0;
+}
+
+.run-card {
+    padding: 20px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+}
+
+.run-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.run-card__title {
+    min-width: 0;
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.run-card__details {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin: 0;
+}
+
+.run-card__field {
+    min-width: 0;
+}
+
+.run-card__field dt {
+    margin-bottom: 6px;
+    color: var(--color-muted);
+    font-size: 12px;
+}
+
+.run-card__field dd {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.run-status {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.run-status--queued {
+    color: #535b68;
+    background: #eceef1;
+}
+
+.run-status--running {
+    color: #234b91;
+    background: #e8effd;
+}
+
+.run-status--succeeded {
+    color: #23613d;
+    background: #e6f3e9;
+}
+
+.run-status--failed {
+    color: #a12d36;
+    background: #fdebed;
+}
+
+.runs-state {
+    display: grid;
+    justify-items: center;
+    gap: 16px;
+    padding: 40px 16px;
+    color: var(--color-muted);
+    text-align: center;
+    line-height: 1.6;
+}
+
+.runs-state__button {
+    min-height: 44px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    background: var(--color-primary);
+    cursor: pointer;
+}
+
+.runs-state__button:hover {
+    background: #263f66;
+}
+
+@media (max-width: 1100px) {
+    .run-card__details {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 479px) {
+    .run-card {
+        padding: 16px;
+    }
+
+    .run-card__details {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
