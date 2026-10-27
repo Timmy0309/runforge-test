@@ -1,54 +1,77 @@
-# React + TypeScript + Vite
+# Runforge — Runs
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Тестовое задание Junior Frontend Developer: страница запусков AI-агентов с поиском, фильтрацией и подробностями запуска.
 
-Currently, two official plugins are available:
+## Стек
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+React 19, TypeScript, Vite 6, HTML и обычный CSS с именованием классов в стиле БЭМ. Для проверки кода используется ESLint.
 
-## Expanding the ESLint configuration
+## Запуск
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Нужны Node.js и npm. Проверка сборки выполнена с Node.js 24.22.1. Команды выполняются в терминале из корня проекта, где находится `package.json`; подходят для Windows PowerShell.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Откройте адрес, который выведет Vite в терминале (обычно http://localhost:5173). Для остановки сервера нажмите Ctrl+C.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Команды
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+| Команда | Назначение |
+| --- | --- |
+| `npm run dev` | Сервер разработки |
+| `npm run build` | Проверка TypeScript и сборка в `dist` |
+| `npm run preview` | Локальный просмотр готовой сборки; сначала выполните build |
+| `npm run lint` | Проверка ESLint |
+| `npm run test` | Запуск тестов |
+
+## Возможности
+
+- Шесть mock-запусков со статусами Queued, Running, Succeeded и Failed.
+- Название, репозиторий, ветка, статус, дата создания и длительность в карточке.
+- Поиск по названию или репозиторию при вводе текста, без учёта регистра и крайних пробелов.
+- Совместная работа поиска и фильтра по статусу; All отключает только фильтрацию по статусу.
+- Модальное окно с данными запуска, логами и результатом, если он есть.
+- Открытие карточки мышью или клавиатурой; закрытие окна крестиком, Esc или кликом снаружи.
+- Состояния загрузки, ошибки с повтором и пустого результата со сбросом поиска и фильтра.
+- Адаптивные стили для экранов от 360 px.
+
+## Структура
+
+```text
+src/
+  components/
+    Layout/               # Сетка страницы и её стили
+    Sidebar.tsx           # Навигация
+    RunsToolbar.tsx       # Поиск и фильтр по статусу
+    RunList.tsx           # Список запусков
+    RunCard.tsx           # Карточка запуска
+    RunStatusBadge.tsx    # Подпись статуса
+    RunDetails.tsx        # Модальное окно
+    RunDetails.css
+    RunsState.tsx         # Загрузка, ошибка, пустой результат
+  data/runs.ts            # Шесть mock-запусков
+  services/mockRuns.ts    # Promise с задержкой 1000 мс
+  types/run.ts            # Типы Run и RunStatus
+  utils/formatters.ts     # Форматирование дат и длительности
+  pages/RunsPage.tsx      # Загрузка данных и состояние страницы
+  pages/RunsPage.css
+  App.tsx
+  main.tsx
+  index.css
 ```
+
+`RunsPage` хранит данные, поисковую строку, выбранный статус и ID открытого запуска. Отфильтрованный список вычисляется из исходного массива; поиск и фильтры не вызывают повторных запросов. Даты отображаются в локальном часовом поясе браузера. Отсутствующая длительность выводится как «Не указана», отсутствующий результат не отображается.
+
+## Тесты
+
+Для тестирования используются Vitest, React Testing Library и `user-event`. Тесты проверяют поведение страницы Runs при действиях пользователя.
+
+Покрытые сценарии:
+- фильтрация запусков по каждому статусу и сброс фильтра;
+- поиск по названию и репозиторию, в том числе одновременно с фильтром статуса;
+- открытие окна подробностей с проверкой данных запуска, логов и результата.
+Mock-сервис подменяется тестовыми данными, поэтому тесты выполняются без ожидания задержки загрузки.
+
