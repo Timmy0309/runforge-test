@@ -1,40 +1,26 @@
 import type { Run } from "../types/run";
 import { RunStatusBadge } from "./RunStatusBadge";
+import { formatDate, formatDuration } from "../utils/formatters";
 
 type RunCardProps = {
     run: Run;
+    onOpen: (runId: string) => void;
 };
 
-const dateFormatter = new Intl.DateTimeFormat("ru-RU", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-});
-
-function formatDate(value: string): string {
-    const date = new Date(value);
-
-    return Number.isNaN(date.getTime())
-        ? "Дата неизвестна"
-        : dateFormatter.format(date);
-}
-
-function formatDuration(seconds: number): string {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-
-    return minutes > 0
-        ? `${minutes} мин ${remainingSeconds} с`
-        : `${remainingSeconds} с`;
-}
-
-export function RunCard({ run }: RunCardProps) {
+export function RunCard({ run, onOpen }: RunCardProps) {
     return (
         <article className="run-card">
             <div className="run-card__header">
-                <h3 className="run-card__title">{run.name}</h3>
+                <h3 className="run-card__title">
+                    <button
+                        className="run-card__open"
+                        type="button"
+                        aria-haspopup="dialog"
+                        onClick={() => onOpen(run.id)}
+                    >
+                        {run.name}
+                    </button>
+                </h3>
                 <RunStatusBadge status={run.status} />
             </div>
 

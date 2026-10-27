@@ -7,6 +7,7 @@ import {
     RunsToolbar,
     type StatusFilter,
 } from "../components/RunsToolbar";
+import { RunDetails } from "../components/RunDetails";
 import "./RunsPage.css";
 
 
@@ -17,6 +18,7 @@ export function RunsPage() {
     const [requestAttempt, setRequestAttempt] = useState(0);
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+    const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
 
     useEffect(() => {
         let ignore = false;
@@ -73,6 +75,8 @@ export function RunsPage() {
         setStatusFilter("all");
     }
 
+    const selectedRun = runs.find((run) => run.id === selectedRunId);
+
     return (
         <div className="runs-page">
             <header className="runs-page__header">
@@ -112,10 +116,17 @@ export function RunsPage() {
                             onReset={hasActiveFilters ? resetFilters : undefined}
                         />
                     ) : (
-                        <RunList runs={filteredRuns} />
+                        <RunList runs={filteredRuns} onOpenRun={setSelectedRunId} />
                     )}
                 </div>
             </section>
+            {selectedRun && (
+                <RunDetails
+                    key={selectedRun.id}
+                    run={selectedRun}
+                    onClose={() => setSelectedRunId(null)}
+                />
+            )}
         </div>
     );
 }
